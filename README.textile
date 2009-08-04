@@ -118,6 +118,7 @@ h2. OTHER OPTIONS
   # Returns a URL to a simple google chart the represents the activity returned by the plugin
   # 
   #   * :type => :bar/:line
+  #   * :column => :activity/:sum
   #   * :size => "200x50"
   #   * :bgcolor => "EFEFEF"
   #   * :chart_color => "336699"
