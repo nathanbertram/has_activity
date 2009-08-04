@@ -45,16 +45,17 @@ module Elctech
           options[:padding] ||= true
           options[:order] ||= :asc
           options[:group_by] ||= :day
-          
+          sum = options[:sum_on] ? "SUM(#{options[:sum_on]}) as sum," : ""
+        
           case options[:group_by]
           when :hour
             sql_statement = sanitize_sql(
               ["SELECT
                   #{activity_options[:by]} AS timestamp,
-                  COUNT(*) AS activity_count,
+                  COUNT(*) AS activity_count, #{sum}
                   ((((YEAR(now()) - YEAR(#{activity_options[:by]}))*365)+(DAYOFYEAR(now())-DAYOFYEAR(#{activity_options[:by]})))*24)+(HOUR(now())-HOUR(#{activity_options[:by]})) as hours_ago,
                   CONCAT(YEAR(#{activity_options[:by]}), CONCAT(DAYOFYEAR(#{activity_options[:by]}), HOUR(#{activity_options[:by]}))) AS unique_hour
-                FROM feeds
+                FROM #{self.table_name}
                 WHERE #{activity_scope} AND #{activity_options[:by]} > ?
                 GROUP BY unique_hour
                 ORDER BY #{activity_options[:by]} ASC",
@@ -67,7 +68,7 @@ module Elctech
             sql_statement = sanitize_sql(
               ["SELECT
                   #{activity_options[:by]} AS timestamp,
-                  COUNT(*) AS activity_count,
+                  COUNT(*) AS activity_count, #{sum}
                   ((YEAR(now()) - YEAR(#{activity_options[:by]}))*52)+(WEEK(now())-WEEK(#{activity_options[:by]})) as weeks_ago,
                   YEARWEEK(#{activity_options[:by]}) AS unique_week
                 FROM #{self.table_name}
@@ -83,7 +84,7 @@ module Elctech
             sql_statement = sanitize_sql(
               ["SELECT
                   #{activity_options[:by]} AS timestamp,
-                  COUNT(*) AS activity_count,
+                  COUNT(*) AS activity_count, #{sum}
                   DATEDIFF(now(), #{activity_options[:by]}) as days_ago
                 FROM #{self.table_name}
                 WHERE #{activity_scope} AND #{activity_options[:by]} > ?
@@ -106,6 +107,7 @@ module Elctech
             entry = {
               :offset => r[unit].to_i,
               :activity => r["activity_count"].to_i,
+              :sum => r["sum"].to_f,
               :date => Time.parse(r["timestamp"])
             }
             (order == :asc) ? rs.push(entry) : rs.unshift(entry)
@@ -123,6 +125,7 @@ module Elctech
               entry = {
                 :offset => current_unit_offset,
                 :activity => results[current_result_index]["activity_count"].to_i,
+                :sum => results[current_result_index]["sum"].to_f,
                 :created_at => Time.parse(results[current_result_index]["timestamp"])
               }
               current_result_index = current_result_index+1
@@ -138,6 +141,7 @@ module Elctech
               entry = {
                 :offset => current_unit_offset,
                 :activity => 0,
+                :sum => 0,
                 :created_at => created_at_given_offset
               }
             end
