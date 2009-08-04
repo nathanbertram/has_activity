@@ -3,6 +3,7 @@ unless Array.instance_methods.include? 'to_activity_gchart'
     # Returns a URL to a simple google chart the represents the activity returned by the plugin
     # 
     #   * :type => :bar/:line
+    #   * :column => :activity/:sum
     #   * :size => "200x50"
     #   * :bgcolor => "EFEFEF"
     #   * :chart_color => "336699"
@@ -12,6 +13,7 @@ unless Array.instance_methods.include? 'to_activity_gchart'
     # 
     def to_activity_gchart(options={})
       options[:type] ||= :graph
+      options[:column] ||= :activity 
       options[:size] ||= "200x50"
       options[:bgcolor] ||= "EFEFEF"
       options[:chart_color] ||= "336699"
@@ -19,14 +21,30 @@ unless Array.instance_methods.include? 'to_activity_gchart'
       options[:line_color] ||= "0077CC"
       options[:line_width] ||= "2"
       
-      max_data_point = self.max{|a,b| a[:activity] <=> b[:activity] }[:activity]
+      activity_max_data_point = self.max{|a,b| a[:activity] <=> b[:activity] }[:activity]
       activity_str = self.map{|a| a[:activity]}.join(",")
+
+      sum_max_data_point = self.max{|a,b| a[:sum] <=> b[:sum] }[:sum]
+      sum_str = self.map{|a| a[:sum]}.join(",")      
       
-      if options[:type] == :line
-        return "http://chart.apis.google.com/chart?chs=#{options[:size]}&cht=ls&chco=#{options[:line_color]}&chm=B,DFEBFF,0,0,0&chd=t:#{activity_str}&chds=0,#{max_data_point}&chf=bg,s,#{options[:bgcolor]}&"
-      else
-        return "http://chart.apis.google.com/chart?cht=bvs&chs=#{options[:size]}&chd=t:#{activity_str}&chco=#{options[:chart_color]}&chbh=a,#{options[:line_width]}&chds=0,#{max_data_point}&chf=bg,s,#{options[:bgcolor]}&"
+      case options[:column]
+        when :activity
+          return generate_url(activity_str, activity_max_data_point, options)        
+        when :sum
+          return generate_url(sum_str, sum_max_data_point, options)
       end
+      
     end
+    
+    private
+    
+    def generate_url(data, max_data_point, options={})
+      if options[:type] == :line  
+        return "http://chart.apis.google.com/chart?chs=#{options[:size]}&cht=ls&chco=#{options[:line_color]}&chm=B,DFEBFF,0,0,0&chd=t:#{data}&chds=0,#{max_data_point}&chf=bg,s,#{options[:bgcolor]}&"
+      else
+        return "http://chart.apis.google.com/chart?cht=bvs&chs=#{options[:size]}&chd=t:#{data}&chco=#{options[:chart_color]}&chbh=a,#{options[:line_width]}&chds=0,#{max_data_point}&chf=bg,s,#{options[:bgcolor]}&"
+      end      
+    end
+    
   end
 end
