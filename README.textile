@@ -25,26 +25,32 @@ h2. INSTALLATION
 h3. As a standard plugin
 
 Run the following command in your projects root
-<pre><code>ruby script/plugin install git://github.com/housekeeper/has_activity.git</pre></code>
+<pre><code>
+ruby script/plugin install git://github.com/housekeeper/has_activity.git
+</code></pre>
 
 h3. As a RubyGem
 
 h4. Step one: Download the gem
 
 Run the following commands
+
 <pre><code>
 gem sources -a http://gems.github.com (you only have to do this once)
 sudo gem install housekeeper-has_activity
-</pre></code>
+</code></pre>
 
 h4. Step two: configure rails 
 
 Add the following line inside Rails::Initializer.run do
+
 <pre><code>
 
   config.gem 'housekeeper-has_activity', :lib => 'has_activity', 
                                          :source => 'http://gems.github.com'
-</pre></code>
+
+
+</code></pre>
 
 h2. USAGE
 
