@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{has_activity}
-  s.version = "0.4.5"
+  s.version = "0.4.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cary Dunn", "Carl Burton"]
@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
      "install.rb",
      "lib/core_ext.rb",
      "lib/has_activity.rb",
+     "rails/init.rb",
      "tasks/has_activity_tasks.rake",
      "test/has_activity_test.rb",
      "test/test_helper.rb",
