@@ -1,4 +1,4 @@
-h1. HasActivity v0.4.5
+h1. HasActivity v0.4.6
 
  * Originally created by Cary Dunn
  * Modified functionality and additional features by HouseKeeper
