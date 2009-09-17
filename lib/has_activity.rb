@@ -6,9 +6,7 @@
 # HasActivity
 
 require 'core_ext'
-require File.expand_path(File.join( File.dirname( __FILE__ ), '..', 'init.rb' ))
 
-module Elctech
   module Has #:nodoc:
     module Activity #:nodoc:
       def self.included(base)
@@ -23,8 +21,8 @@ module Elctech
         
         def has_activity(options={})
           options[:by] ||= "created_at"
-          include Elctech::Has::Activity::InstanceMethods
-          extend Elctech::Has::Activity::SingletonMethods
+          include Has::Activity::InstanceMethods
+          extend Has::Activity::SingletonMethods
           
           self.activity_options = options
         end
@@ -230,4 +228,3 @@ module Elctech
       
     end
   end
-end
