@@ -1,13 +1,17 @@
 h1. HasActivity
 ---------------
 
-A simple way to grab recent activity on a given model from a table grouped by day, hour,
+ * Originally created by Cary Dunn
+ * Modified functionality and additional features by HouseKeeper
+
+A simple way to grab recent activity or a sum of values on a given model from a table grouped by day, hour,
 or week with only 1 SQL query and giving the ability to pad the results for days/weeks/hours with no activity.
 
 The plugin offers the ability to...
   * Present as a Google Chart (line or bar)
   * Scope your model to given :conditions
   * Pad your results for days with no activity
+  * Present your data from a set date until present or between two dates
 
 NOTE: MySQL only because of date functions use.
 
@@ -92,11 +96,55 @@ SQL generated for previous statement...
    ORDER BY published_at ASC
 </code></pre>
 
+<pre><code>
+  # Get Usd Net Commission in July ago grouped by day and order it in ascending order by the days commission was earnt on for account_id 1
+  AccountPnl.activity_between(july_month.beginning_of_month,
+                              july_month.end_of_month, 
+                              :group_by => :day, 
+                              :padding => false, 
+                              :sum_on => "usd_net_commission",
+                              :conditions => ["crm_account_id=?", 1], 
+                              :order => :asc)
+</code></pre>
+
+SQL generated for previous statement...
+<pre><code>
+SELECT
+ earnt_on AS timestamp,
+ COUNT(*) AS activity_count, SUM(usd_net_commission) as sum,
+ DATEDIFF('2009-07-31 23:59:59', earnt_on) as days_ago
+ FROM crm_daily_account_pnls 
+ WHERE crm_account_id=16 AND earnt_on
+ BETWEEN '2009-07-01 00:00:00' AND '2009-07-31 23:59:59' 
+ GROUP BY days_ago 
+ ORDER BY earnt_on ASC
+</code></pre>
+
+
 h2. CONVERT DATA INTO GOOGLE CHART
 
 <pre><code>
 Feed.activity_since(6.months.ago, :group_by => :week, :order => :desc).to_activity_gchart
 => "http://chart.apis.google.com/chart?cht=bvs&chs=200x50&chd=t:0,10,15,3,8,4,0,3,2,3,0,11,4,23,14,0,0,0,13,0,4,8,19,10,12,21,1&chco=336699&chbh=a,2&chds=0,23&chf=bg,s,EFEFEF&"
+</code></pre>
+
+<pre><code>
+Feed.activity_since(6.months.ago, :group_by => :week, :order => :desc).to_activity_gchart
+  AccountPnl.activity_between(july_month.beginning_of_month,
+                              july_month.end_of_month, 
+                              :group_by   => :day, 
+                              :padding    => false, 
+                              :sum_on     => "usd_net_commission",
+                              :conditions => ["crm_account_id=?", 1], 
+                              :order      => :asc).to_activity_gchart( :type => :line, 
+                                                                       :column => :sum,
+                                                                       :size => "100x45", 
+                                                                       :bgcolor => "f0ffdc", 
+                                                                       :chart_color => "D1EAFF", 
+                                                                       :area_color => "DFEBFF",
+                                                                       :line_color => "c7c7c7", 
+                                                                       :line_width => "4"))
+=> "http://chart.apis.google.com/chart?chs=100x45&cht=ls&chco=c7c7c7&chm=B,DFEBFF,0,0,0&chd=t:<data>&chds=0,0&chf=bg,s,f0ffdc&"
 </code></pre>
 
 h2. OTHER OPTIONS
@@ -118,7 +166,6 @@ h2. OTHER OPTIONS
   # Returns a URL to a simple google chart the represents the activity returned by the plugin
   # 
   #   * :type => :bar/:line
-  #   * :column => :activity/:sum
   #   * :size => "200x50"
   #   * :bgcolor => "EFEFEF"
   #   * :chart_color => "336699"
@@ -132,9 +179,17 @@ h2. OTHER OPTIONS
 h2. INDEX THE TIMESTAMP YOU USE
 
 Obviously there is not "one index fits all" but you should include an index on at least the timestamp that fits the conditions you are using.
-
+The same applies when performing SUM on a column.
 <pre><code>
 add_index :model, [:created_at]
 </code></pre>
 
+h2. NOTES
+
+ * Using sum and creating Bar Charts is not fully tested - HouseKeeper
+ * Some work still needs to be done on the queiries and a tidy up of has_activity.rb
+
 Copyright (c) 2009 Cary Dunn <cary.dunn@gmail.com> "http://elctech.com":http://elctech.com, released under the MIT license
+Modified by HouseKeeper
+ - Added the ability to sum a column - giving you a total ammount from a date until now or between 2 dates 
+ - Added Between functionality so you can get activity or sums between 2 specified dates

@@ -1,7 +1,7 @@
 #  
 # => has_activity
 # => Cary Dunn <cary.dunn@gmail.com>
-#  
+# => Modified by HouseKeeper: added between methods and sum option 
 
 # HasActivity
 
@@ -31,6 +31,78 @@ module Elctech
       
       module SingletonMethods
         
+        # Grabs a hash of the activity between <time a> AND <time b>grouped by <hour/day/week>
+        # 
+        #   * :conditions
+        #       same as the standard Rails finder. Used to scope your activity to a particular user, etc.
+        #   * :padding
+        #       true/false
+        #   * :group_by
+        #       :hour, :day, :week
+        # 
+        def activity_between(between=1.week.ago, andbetween=Time.now.utc, options={})
+          activity_scope = (options.has_key?(:conditions) ? sanitize_sql(options[:conditions]) : "1=1")
+          options[:padding] ||= true
+          options[:order] ||= :asc
+          options[:group_by] ||= :day
+          sum = options[:sum_on] ? "SUM(#{options[:sum_on]}) as sum," : ""
+           
+          case options[:group_by]
+          when :hour
+            sql_statement = sanitize_sql(
+              ["SELECT
+                  #{activity_options[:by]} AS timestamp,
+                  COUNT(*) AS activity_count, #{sum}
+                  ((((YEAR(now()) - YEAR(#{activity_options[:by]}))*365)+(DAYOFYEAR(now())-DAYOFYEAR(#{activity_options[:by]})))*24)+(HOUR(now())-HOUR(#{activity_options[:by]})) as hours_ago,
+                  CONCAT(YEAR(#{activity_options[:by]}), CONCAT(DAYOFYEAR(#{activity_options[:by]}), HOUR(#{activity_options[:by]}))) AS unique_hour
+                FROM #{self.table_name}
+                WHERE #{activity_scope} AND #{activity_options[:by]} > ?
+                GROUP BY unique_hour
+                ORDER BY #{activity_options[:by]} ASC",
+                between.to_s(:db)
+              ]
+            )
+            unit = "hours_ago"
+            oldest_possible_unit = ((andbetween-between)/60)/60
+          when :week
+            sql_statement = sanitize_sql(
+              ["SELECT
+                  #{activity_options[:by]} AS timestamp,
+                  COUNT(*) AS activity_count, #{sum}
+                  ((YEAR(now()) - YEAR(#{activity_options[:by]}))*52)+(WEEK(now())-WEEK(#{activity_options[:by]})) as weeks_ago,
+                  YEARWEEK(#{activity_options[:by]}) AS unique_week
+                FROM #{self.table_name}
+                WHERE #{activity_scope} AND #{activity_options[:by]} 
+                BETWEEN ? AND ?
+                GROUP BY unique_week
+                ORDER BY #{activity_options[:by]} ASC",
+                between.to_s(:db),andbetween.to_s(:db)
+              ]
+            )
+            unit = "weeks_ago"
+            oldest_possible_unit = ((((andbetween-between)/60)/60)/24)/7
+          else
+            sql_statement = sanitize_sql(
+              ["SELECT
+                  #{activity_options[:by]} AS timestamp,
+                  COUNT(*) AS activity_count, #{sum}
+                  DATEDIFF('#{andbetween.to_s(:db)}', #{activity_options[:by]}) as days_ago
+                  FROM #{self.table_name} 
+                WHERE #{activity_scope} AND #{activity_options[:by]}
+                BETWEEN ? AND ? 
+                GROUP BY days_ago 
+                ORDER BY #{activity_options[:by]} ASC",
+                between.to_s(:db), andbetween.to_s(:db)
+              ]
+            )
+            unit = "days_ago"
+            oldest_possible_unit = (((andbetween-between)/60)/60)/24
+          end
+          
+          results = connection.select_all(sql_statement)
+          (options[:padding] ? pad_activity_results(results, unit, oldest_possible_unit.round, options[:order]) : format_activity_results(results, unit, order))
+        end
+        
         # Grabs a hash of the activity since <time ago> grouped by <hour/day/week>
         # 
         #   * :conditions
@@ -46,7 +118,7 @@ module Elctech
           options[:order] ||= :asc
           options[:group_by] ||= :day
           sum = options[:sum_on] ? "SUM(#{options[:sum_on]}) as sum," : ""
-        
+           
           case options[:group_by]
           when :hour
             sql_statement = sanitize_sql(
