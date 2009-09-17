@@ -5,6 +5,7 @@ h1. HasActivity
  * Modified functionality and additional features by HouseKeeper
  ** Added the ability to sum a column - giving you a total ammount from a date until now or between 2 dates 
  ** Added Between functionality so you can get activity or sums between 2 specified dates
+ ** Created a gem version of this plugin
 
 A simple way to grab recent activity or a sum of values on a given model from a table grouped by day, hour,
 or week with only 1 SQL query and giving the ability to pad the results for days/weeks/hours with no activity.
@@ -26,19 +27,25 @@ h3. As a standard plugin
 
 Run the following command in your projects root
 <pre><code>
-ruby script/plugin install git://github.com/housekeeper/has_activity.git
+
+  ruby script/plugin install git://github.com/housekeeper/has_activity.git
+
 </code></pre>
 
 h3. As a RubyGem
+
 
 h4. Step one: Download the gem
 
 Run the following commands
 
 <pre><code>
-gem sources -a http://gems.github.com (you only have to do this once)
-sudo gem install housekeeper-has_activity
+
+  gem sources -a http://gems.github.com (you only have to do this once)
+  sudo gem install housekeeper-has_activity
+
 </code></pre>
+
 
 h4. Step two: configure rails 
 
@@ -52,7 +59,9 @@ Add the following line inside Rails::Initializer.run do
 
 </code></pre>
 
+
 h2. USAGE
+------------------------
 
 <pre><code>
   class Feed < ActiveRecord::Base
