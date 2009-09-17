@@ -1,5 +1,4 @@
-h1. HasActivity
----------------
+h1. HasActivity v0.4.5
 
  * Originally created by Cary Dunn
  * Modified functionality and additional features by HouseKeeper
@@ -21,7 +20,6 @@ NOTE: MySQL only because of date functions use.
 "Example Google Chart Generated":http://chart.apis.google.com/chart?cht=bvs&chs=200x50&chd=t:0,10,15,3,8,4,0,3,2,3,0,11,4,23,14,0,0,0,13,0,4,8,19,10,12,21,1&chco=336699&chbh=a,2&chds=0,23&chf=bg,s,EFEFEF&
 
 h2. INSTALLATION
-------------------------
 
 h3. As a standard plugin
 
@@ -61,7 +59,6 @@ Add the following line inside Rails::Initializer.run do
 
 
 h2. USAGE
-------------------------
 
 <pre><code>
   class Feed < ActiveRecord::Base
