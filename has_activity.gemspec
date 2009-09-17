@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
      "README.textile",
      "Rakefile",
      "MIT-LICENSE",
-     "install.rb"
+     "install.rb",
      "init.rb",
      "has_activity.gemspec",
      "test/test_helper.rb",
