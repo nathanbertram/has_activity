@@ -187,7 +187,7 @@ add_index :model, [:created_at]
 h2. NOTES
 
  * Using sum and creating Bar Charts is not fully tested - HouseKeeper
- * Some work still needs to be done on the queiries and a tidy up of has_activity.rb
+ * Some work still needs to be done on the queries and a tidy up of has_activity.rb
 
 Copyright (c) 2009 Cary Dunn <cary.dunn@gmail.com> "http://elctech.com":http://elctech.com, released under the MIT license
 Modified by HouseKeeper
