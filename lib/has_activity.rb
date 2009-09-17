@@ -1,11 +1,12 @@
 #  
 # => has_activity
 # => Cary Dunn <cary.dunn@gmail.com>
-# => Modified by HouseKeeper: added between methods and sum option 
+# => Modified by HouseKeeper: added between methods and sum option and added functionality for gem
 
 # HasActivity
 
 require 'core_ext'
+require File.expand_path(File.join( File.dirname( __FILE__ ), '..', 'init.rb' ))
 
 module Elctech
   module Has #:nodoc:
