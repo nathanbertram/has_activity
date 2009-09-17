@@ -3,6 +3,8 @@ h1. HasActivity
 
  * Originally created by Cary Dunn
  * Modified functionality and additional features by HouseKeeper
+ ** Added the ability to sum a column - giving you a total ammount from a date until now or between 2 dates 
+ ** Added Between functionality so you can get activity or sums between 2 specified dates
 
 A simple way to grab recent activity or a sum of values on a given model from a table grouped by day, hour,
 or week with only 1 SQL query and giving the ability to pad the results for days/weeks/hours with no activity.
@@ -189,7 +191,5 @@ h2. NOTES
  * Using sum and creating Bar Charts is not fully tested - HouseKeeper
  * Some work still needs to be done on the queries and a tidy up of has_activity.rb
 
-Copyright (c) 2009 Cary Dunn <cary.dunn@gmail.com> "http://elctech.com":http://elctech.com, released under the MIT license
-Modified by HouseKeeper
- - Added the ability to sum a column - giving you a total ammount from a date until now or between 2 dates 
- - Added Between functionality so you can get activity or sums between 2 specified dates
+Copyright (c) 2009 Cary Dunn <cary.dunn@gmail.com>, HouseKeeper <carl@house-keeping.com>, released under the MIT license
+
